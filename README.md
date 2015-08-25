@@ -25,5 +25,27 @@ The next section creates the UDP session by generating a re-usable socket on a g
   3. The UDP tunnel establishes as one of the NATs allows the packet through.
   4. Perhaps TCP over UDP?
   
-## Usage:
-I'll let you know as soon as I do!
+## Documentation:
+In this section, I'll go over each method and attribute that you (should) alter or call. Note that any changes to the Data or ID of any packet will require you to ensure that both endpoints have the same change.
+#### ICMP
+The ICMP class is used for oneclient to discovery the peer's IP address provided that the second peer knows the IP of the first. If both clients provide one another's IP's, the ICMP objects are unnecessary.
+
+
+```request = slapnat.icmprequest(self, data=_ICMP_DATA, id=_ICMP_ID)```<br>
+Creates the Echo Request packet and sets the ICMP type to <a href="https://en.wikipedia.org/wiki/Internet_Control_Message_Protocol#Control_messages" target="_blank">8</a>. Inherents the `_icmp` class. `data` must be a \<str\> type in Python2 and a \<bytes\> type in Python3. `id` must be an unsigned long integer, preferably formatted such as `0xbeef`.
+
+```timeout = slapnat.icmptimeout(self, request=icmprequest())```<br>
+Creates the ICMP Time to Live Exceeded packet based off of an `icmprequest()` instance. Inherents the `_icmp` class. Pass an instance of `icmprequest` if you are not using the default Data and ID settings.
+
+```instance.createSocket(self, destination)```<br>
+Creates a raw ICMP socket that will send to the desired destination. Located in the `_icmp` base class. The socket will be stored in `instance._socket`, and the destination is stored in `instance._destination`. These should not be accessed directly.
+
+
+```instance.sendEvery(self, frequency=3)```<br>
+Creates a thread and an event to send the previously constructed packet data via the socket created using the aforementioned method. If no such object exists, it will throw a `NameError`. Thread is stored in `instance._thread`, frequency is stored in `instance._freq`, and the threading event is stored in `instance._stop`. These should not be accessed directly.
+
+```instance.stop(self)``` <br>
+Sets the `instance._stop` event to halt the sending of the packet. This should be done when you receive the IP of the other party (if it is not provided).
+
+## Undocumentation:
+These are the methods and attributes that you should not call or alter directly. This is purely for undocumentation purposes.
